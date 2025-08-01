@@ -9,7 +9,7 @@ namespace Shop.Application.Services.AttributeServices
 {
     public class AttributeValueService : Service<AttributeValue, AttributeValueDto>, IAttributeValueService, IScopedDependency
     {
-        public AttributeValueService(IAttributeValueRepository repository, AttributeValueMapper mapper) : base(repository, mapper)
+        public AttributeValueService(IAttributeValueRepository repository) : base(repository)
         {
         }
     }

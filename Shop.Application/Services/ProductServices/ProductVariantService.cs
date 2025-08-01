@@ -10,7 +10,7 @@ namespace Shop.Application.Services.ProductServices
 {
     public class ProductVariantService : Service<ProductVariant, ProductVariantDto>, IProductVariantService, IScopedDependency
     {
-        public ProductVariantService(IProductVariantRepository repository, ProductVariantMapper mapper) : base(repository, mapper)
+        public ProductVariantService(IProductVariantRepository repository) : base(repository)
         {
         }
     }

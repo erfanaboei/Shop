@@ -1,29 +1,93 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using Shop.Domain.DataTransferObjects;
 using Shop.Domain.DataTransferObjects.GeneralDataTransferObjects;
+using Shop.Domain.Models;
 
 namespace Shop.Application.Mappings
 {
-    public abstract class GenericMapper<TModel, TDto> where TModel : class where TDto : class
+    public interface IMapper
     {
-        public abstract TDto ToDto(TModel model);
-        public abstract TModel ToModel(TDto dto);
-        public abstract OptionDto ToOption(TModel model);
+        
+    }
+    
+    public abstract class GenericMapper<TModel, TDto> : IMapper where TModel : class, IEntity, new() where TDto : class, IDto, new()
+    {
+        private static readonly ConcurrentDictionary<(Type SourceType, Type TargetType), List<(PropertyInfo SourceProp, PropertyInfo TargetProp)>> _propertyMapCache = new();
+        
+        public virtual TDto ToDto(TModel model, TDto dto = null)
+        {
+            if (model == null) return null;
+            
+            var result = dto ?? Activator.CreateInstance<TDto>();
+            var key = (typeof(TModel), typeof(TDto));
+
+            if (!_propertyMapCache.TryGetValue(key, out var propertyMap))
+            {
+                propertyMap = (
+                    from dtoProp in typeof(TDto).GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                    join modelProp in typeof(TModel).GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                    on dtoProp.Name equals modelProp.Name
+                    where dtoProp.CanWrite && (dtoProp.PropertyType == modelProp.PropertyType ||
+                                               Nullable.GetUnderlyingType(dtoProp.PropertyType) == modelProp.PropertyType ||
+                                               Nullable.GetUnderlyingType(modelProp.PropertyType) == dtoProp.PropertyType)
+                    select (modelProp, dtoProp)
+                ).ToList();
+                
+                _propertyMapCache[key] = propertyMap;
+            }
+
+            foreach (var (sourceProp, targetProp) in propertyMap)
+            {
+                var value = sourceProp.GetValue(model);
+                targetProp.SetValue(result, value);
+            }
+            
+            return result;
+        }
+
+        public virtual TModel ToModel(TDto dto, TModel model = null)
+        {
+            if (dto == null) return null;
+            
+            var result = model ?? Activator.CreateInstance<TModel>();
+            var key = (typeof(TDto), typeof(TModel));
+
+            if (!_propertyMapCache.TryGetValue(key, out var propertyMap))
+            {
+                propertyMap = (
+                    from dtoProp in typeof(TDto).GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                    join modelProp in typeof(TModel).GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                    on dtoProp.Name equals modelProp.Name
+                    where modelProp.CanWrite && (dtoProp.PropertyType == modelProp.PropertyType ||
+                                                 Nullable.GetUnderlyingType(dtoProp.PropertyType) == modelProp.PropertyType ||
+                                                 Nullable.GetUnderlyingType(modelProp.PropertyType) == dtoProp.PropertyType)
+                    select (dtoProp, modelProp)
+                ).ToList();
+                
+                _propertyMapCache[key] = propertyMap;
+            }
+
+            foreach (var (sourceProp, targetProp) in propertyMap)
+            {
+                var value = sourceProp.GetValue(dto);
+                targetProp.SetValue(result, value);
+            }
+            
+            return result;
+        }
 
         public virtual List<TDto> ToDtoList(IEnumerable<TModel> models)
         {
-            return models.Select(ToDto).ToList();
+            return models == null ? new List<TDto>() : models.Select(r=> ToDto(r)).ToList();
         }
 
         public virtual List<TModel> ToModelList(IEnumerable<TDto> dtoList)
         {
-            return dtoList.Select(ToModel).ToList();
-        }
-
-        public virtual List<OptionDto> ToOptionList(IEnumerable<TModel> models)
-        {
-            return models.Select(ToOption).ToList();
+            return dtoList == null ? new List<TModel>() : dtoList.Select(r => ToModel(r)).ToList();
         }
     }
 }

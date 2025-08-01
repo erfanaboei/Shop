@@ -2,9 +2,13 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.VisualBasic.CompilerServices;
+using Shop.Domain.CustomAttributes;
 
 namespace Shop.Domain.Models.Users
 {
+    [OptionKey(nameof(Id))]
+    [OptionDisplayText(" ", new[] {nameof(Name), nameof(Family)})]
     public class User : IdentityUser<int>, IEntity
     {
         public string Name { get; set; }

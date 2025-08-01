@@ -2,13 +2,17 @@
 
 namespace Shop.Domain.DataTransferObjects
 {
+    public interface IDto
+    {
+        
+    }
 
-    public class BasePureDto
+    public class BasePureDto : IDto
     {
         public int Id { get; set; }
     }
     
-    public class BasePureDto<TKey>
+    public class BasePureDto<TKey> : IDto
     {
         public TKey Id { get; set; }
     }

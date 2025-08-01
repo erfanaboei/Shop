@@ -9,7 +9,7 @@ namespace Shop.Application.Services.SuperSettingServices
 {
     public class SuperSettingService : Service<SuperSetting, SuperSettingDto>, ISuperSettingService, IScopedDependency
     {
-        public SuperSettingService(ISuperSettingRepository repository, SuperSettingMapper mapper) : base(repository, mapper)
+        public SuperSettingService(ISuperSettingRepository repository) : base(repository)
         {
         }
     }

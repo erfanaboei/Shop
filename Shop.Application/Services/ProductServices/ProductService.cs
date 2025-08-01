@@ -12,7 +12,7 @@ namespace Shop.Application.Services.ProductServices
 {
     public class ProductService : Service<Product, ProductDto>, IProductService, IScopedDependency
     {
-        public ProductService(IProductRepository repository, ProductMapper mapper) : base(repository, mapper)
+        public ProductService(IProductRepository repository) : base(repository)
         {
         }
 

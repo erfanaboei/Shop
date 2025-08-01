@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading;
@@ -15,15 +16,15 @@ using Shop.Domain.Models;
 
 namespace Shop.Application.Services
 {
-    public class Service<TModel, TDto> : IService<TModel, TDto> where TModel : class where TDto : class
+    public class Service<TModel, TDto> : IService<TModel, TDto>
+        where TModel : class, IEntity, new() 
+        where TDto : class, IDto, new()
     {
         protected readonly IRepository<TModel> Repository;
-        protected readonly GenericMapper<TModel, TDto> Mapper;
 
-        public Service(IRepository<TModel> repository, GenericMapper<TModel, TDto> mapper)
+        public Service(IRepository<TModel> repository)
         {
             Repository = repository;
-            Mapper = mapper;
         }
 
         public virtual List<TModel> GetAll(Expression<Func<TModel, bool>> conditions = null)
@@ -34,7 +35,7 @@ namespace Shop.Application.Services
         public virtual List<TDto> GetAllDto(Expression<Func<TModel, bool>> conditions = null)
         {
             var models = GetAll(conditions);
-            return Mapper.ToDtoList(models);
+            return models.Select(model => model.ToDto<TModel, TDto>().Map()).ToList();
         }
 
         public virtual TModel GetById(int id)
@@ -45,7 +46,7 @@ namespace Shop.Application.Services
         public virtual TDto GetDtoById(int id)
         {
             var model = GetById(id);
-            return Mapper.ToDto(model);
+            return model.ToDto<TModel, TDto>().Map();
         }
 
         public virtual TModel GetByQuery(Expression<Func<TModel, bool>> conditions)
@@ -56,7 +57,7 @@ namespace Shop.Application.Services
         public virtual TDto GetDtoByQuery(Expression<Func<TModel, bool>> conditions)
         {
             var model = GetByQuery(conditions);
-            return Mapper.ToDto(model);
+            return model.ToDto<TModel, TDto>().Map();
         }
 
         public virtual RequestResult<TDto> Add(TDto dto)
@@ -66,7 +67,7 @@ namespace Shop.Application.Services
             
             SetDefaultValueIfMatch(dto, nameof(BaseDto.CreateDate), DateTime.Now, DateTime.MinValue);
             
-            var model = Mapper.ToModel(dto);
+            var model = dto.ToModel<TModel, TDto>().Map();
             Repository.Add(model);
             
             return new RequestResult<TDto>(true, RequestResultStatusCode.Success, dto);
@@ -93,7 +94,7 @@ namespace Shop.Application.Services
 
             SetDefaultValueIfMatch(dto, nameof(BaseDto.UpdateDate), DateTime.Now, DateTime.MinValue);
             
-            var model = Mapper.ToModel(dto);
+            var model = dto.ToModel<TModel, TDto>().Map();
             Repository.Update(model);
             
             return new RequestResult<TDto>(true, RequestResultStatusCode.Success, dto);
@@ -155,7 +156,7 @@ namespace Shop.Application.Services
             
             var options = GetAll(conditions); 
             
-            result.AddRange(Mapper.ToOptionList(options));
+            //result.AddRange(Mapper.ToOptionList(options));
 
             return result;
         }
@@ -175,7 +176,7 @@ namespace Shop.Application.Services
         public virtual async Task<List<TDto>> GetAllDtoAsync(CancellationToken cancellationToken, Expression<Func<TModel, bool>> conditions = null)
         {
             var models = await GetAllAsync(cancellationToken, conditions);
-            return Mapper.ToDtoList(models);
+            return models.Select(model => model.ToDto<TModel, TDto>().Map()).ToList();
         }
 
         public virtual async Task<TModel> GetByIdAsync(int id, CancellationToken cancellationToken)
@@ -186,7 +187,7 @@ namespace Shop.Application.Services
         public virtual async Task<TDto> GetDtoByIdAsync(int id, CancellationToken cancellationToken)
         {
             var model = await GetByIdAsync(id, cancellationToken);
-            return Mapper.ToDto(model);
+            return model.ToDto<TModel, TDto>().Map();
         }
 
         public virtual async Task<TModel> GetByQueryAsync(Expression<Func<TModel, bool>> conditions, CancellationToken cancellationToken)
@@ -197,7 +198,7 @@ namespace Shop.Application.Services
         public virtual async Task<TDto> GetDtoByQueryAsync(Expression<Func<TModel, bool>> conditions, CancellationToken cancellationToken)
         {
             var model = await GetByQueryAsync(conditions, cancellationToken);
-            return Mapper.ToDto(model);
+            return model.ToDto<TModel, TDto>().Map();
         }
 
         public virtual async Task<RequestResult<TDto>> AddAsync(TDto dto, CancellationToken cancellationToken)
@@ -207,7 +208,7 @@ namespace Shop.Application.Services
 
             SetDefaultValueIfMatch(dto, nameof(BaseDto.CreateDate), DateTime.Now, DateTime.MinValue);
             
-            var model = Mapper.ToModel(dto);
+            var model = dto.ToModel<TModel, TDto>().Map();
             /*var result =*/ await Repository.AddAsync(model, cancellationToken);
 
             // if (result == null)
@@ -237,7 +238,7 @@ namespace Shop.Application.Services
 
             SetDefaultValueIfMatch(dto, nameof(BaseDto.UpdateDate), DateTime.Now, DateTime.MinValue);
             
-            var model = Mapper.ToModel(dto);
+            var model = dto.ToModel<TModel, TDto>().Map();
             await Repository.UpdateAsync(model, cancellationToken);
             
             return new RequestResult<TDto>(true , RequestResultStatusCode.Success, dto);
@@ -299,7 +300,8 @@ namespace Shop.Application.Services
                 });
             
             var options = await GetAllAsync(cancellationToken, conditions);
-            result.AddRange(Mapper.ToOptionList(options));
+            
+            result.AddRange(options.ToOptions());
 
             return result;
         }

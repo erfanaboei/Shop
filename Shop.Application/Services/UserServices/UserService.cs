@@ -20,7 +20,7 @@ namespace Shop.Application.Services.UserServices
         private readonly IJwtService _jwtService;
         private readonly UserManager<User> _userManager;
 
-        public UserService(UserMapper mapper, IUserRepository userRepository, IJwtService jwtService, UserManager<User> userManager) : base(userRepository ,mapper)
+        public UserService(IUserRepository userRepository, IJwtService jwtService, UserManager<User> userManager) : base(userRepository)
         {
             _userRepository = userRepository;
             _jwtService = jwtService;

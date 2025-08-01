@@ -10,7 +10,7 @@ namespace Shop.Application.Services.CategoryServices
 {
     public class CategoryService : Service<Category, CategoryDto>, ICategoryService, IScopedDependency
     {
-        public CategoryService(IRepository<Category> repository, CategoryMapper mapper) : base(repository, mapper)
+        public CategoryService(IRepository<Category> repository) : base(repository)
         {
         }
     }

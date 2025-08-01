@@ -1,3 +1,4 @@
+using System.Reflection;
 using Autofac;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -7,6 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Shop.Application;
+using Shop.Application.Mappings;
+using Shop.Application.Mappings.UserMappings;
 using Shop.Application.Utilities;
 using Shop.IOC;
 using Shop.IOC.Configurations;
@@ -50,7 +53,10 @@ namespace Shop.Presentation
 
             services.AddCustomIdentityConfiguration(_siteSetting.IdentitySetting);
             services.AddJwtAuthentication(_siteSetting.JwtSetting);
-
+            services.RegisterGenericMapper();
+            
+            GenericMapperRegistry.RegisterAll();
+            
             DependencyContainer.RegisterServices(services);
         }
 

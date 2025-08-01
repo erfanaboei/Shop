@@ -9,7 +9,7 @@ namespace Shop.Application.Services.RoleServices
 {
     public class RoleService : Service<Role, RoleDto>, IRoleService, IScopedDependency
     {
-        public RoleService(IRoleRepository repository, RoleMapper mapper) : base(repository, mapper)
+        public RoleService(IRoleRepository repository) : base(repository)
         {
         }
     }
