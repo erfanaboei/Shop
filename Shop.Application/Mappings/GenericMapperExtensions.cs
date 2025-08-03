@@ -28,22 +28,22 @@ namespace Shop.Application.Mappings
         //     return mapper.ToDto(model, dto);
         // }
 
-        public static FluentGenericMapperContext<TDto, TModel> ToModel<TModel, TDto>(this TDto dto, TModel model = null) 
+        public static FluentToModelMapperContext<TDto, TModel> ToModel<TModel, TDto>(this TDto dto, TModel model = null) 
             where TModel : class, IEntity, new()
             where TDto : class, IDto, new()
         {
-            var mapper = GenericMapperRegistry.GetMapper<TModel, TDto>();
-            var baseModel = mapper.ToModel(dto, model);
-            return new FluentGenericMapperContext<TDto, TModel>(dto, baseModel);
+            // var mapper = GenericMapperRegistry.GetMapper<TModel, TDto>();
+            // var baseModel = mapper.ToModel(dto, model);
+            return new FluentToModelMapperContext<TDto, TModel>(dto, model);
         }
 
-        public static FluentGenericMapperContext<TModel, TDto> ToDto<TModel, TDto>(this TModel model, TDto dto = null)
+        public static FluentToDtoMapperContext<TModel, TDto> ToDto<TModel, TDto>(this TModel model, TDto dto = null)
             where TModel : class, IEntity, new()
             where TDto : class, IDto, new()
         {
-            var mapper = GenericMapperRegistry.GetMapper<TModel, TDto>();
-            var baseDto = mapper.ToDto(model, dto);
-            return new FluentGenericMapperContext<TModel, TDto>(model, baseDto);
+            // var mapper = GenericMapperRegistry.GetMapper<TModel, TDto>();
+            // var baseDto = mapper.ToDto(model, dto);
+            return new FluentToDtoMapperContext<TModel, TDto>(model, dto);
         }
 
         public static OptionDto ToOption<TModel>(this TModel model, Func<TModel, object> valueGetter = null, Func<TModel, object> textGetter = null)
@@ -101,8 +101,7 @@ namespace Shop.Application.Mappings
             };
         }
 
-        public static List<OptionDto> ToOptions<TModel>(this List<TModel> models,
-            Func<TModel, object> valueGetter = null, Func<TModel, object> textGetter = null)
+        public static List<OptionDto> ToOptions<TModel>(this List<TModel> models, Func<TModel, object> valueGetter = null, Func<TModel, object> textGetter = null)
             where TModel : class, IEntity, new()
         {
             return models.Select(r => ToOption(r, valueGetter, textGetter)).ToList();

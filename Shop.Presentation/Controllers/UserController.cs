@@ -73,8 +73,24 @@ namespace Shop.Presentation.Controllers
 
             //var users = await _userService.GetAllAsync(CancellationToken.None);
 
-            //var test = users.ToOptions(user => user.UserName, user => $"{user.Name} {user.Family}");
-            //var test = users.ToOptions();
+            // var test = users.ToOptions(user => user.UserName, user => $"{user.Name} {user.Family}");
+            // var test = users.ToOptions();
+
+            var user = await _userService.GetByIdAsync(11, CancellationToken.None);
+
+            var testDto = new UserDto()
+            {
+                UserName = "TESTTESTSETETSETS",
+                Email = "tt",
+                Password = "jasdlkfjaskdlf",
+                Code = "654645"
+            };
+            
+            user.ToDto(testDto)
+                .Ignore(r=> r.UserName)
+                .Ignore(r=> r.Password)
+                .Ignore(r=> r.Code)
+                .Map();
             
             return new RequestResult(true, RequestResultStatusCode.Success);
         }

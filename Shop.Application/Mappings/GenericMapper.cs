@@ -18,7 +18,7 @@ namespace Shop.Application.Mappings
     {
         private static readonly ConcurrentDictionary<(Type SourceType, Type TargetType), List<(PropertyInfo SourceProp, PropertyInfo TargetProp)>> _propertyMapCache = new();
         
-        public virtual TDto ToDto(TModel model, TDto dto = null)
+        public virtual TDto ToDto(TModel model, TDto dto = null, IEnumerable<string> ignoreProperties = null)
         {
             if (model == null) return null;
             
@@ -27,6 +27,7 @@ namespace Shop.Application.Mappings
 
             if (!_propertyMapCache.TryGetValue(key, out var propertyMap))
             {
+                
                 propertyMap = (
                     from dtoProp in typeof(TDto).GetProperties(BindingFlags.Public | BindingFlags.Instance)
                     join modelProp in typeof(TModel).GetProperties(BindingFlags.Public | BindingFlags.Instance)
@@ -40,7 +41,14 @@ namespace Shop.Application.Mappings
                 _propertyMapCache[key] = propertyMap;
             }
 
-            foreach (var (sourceProp, targetProp) in propertyMap)
+            var finalMap = propertyMap.ToList();
+
+            if (ignoreProperties != null && ignoreProperties.Any())
+            {
+                finalMap = propertyMap.Where(r => !ignoreProperties.Contains(r.SourceProp.Name)).ToList();
+            }
+            
+            foreach (var (sourceProp, targetProp) in finalMap)
             {
                 var value = sourceProp.GetValue(model);
                 targetProp.SetValue(result, value);
@@ -49,7 +57,7 @@ namespace Shop.Application.Mappings
             return result;
         }
 
-        public virtual TModel ToModel(TDto dto, TModel model = null)
+        public virtual TModel ToModel(TDto dto, TModel model = null, IEnumerable<string> ignoreProperties = null)
         {
             if (dto == null) return null;
             
@@ -71,7 +79,14 @@ namespace Shop.Application.Mappings
                 _propertyMapCache[key] = propertyMap;
             }
 
-            foreach (var (sourceProp, targetProp) in propertyMap)
+            var finalMap = propertyMap.ToList();
+
+            if (ignoreProperties != null && ignoreProperties.Any())
+            {
+                finalMap = propertyMap.Where(r => ignoreProperties.Contains(r.SourceProp.Name)).ToList();
+            }
+            
+            foreach (var (sourceProp, targetProp) in finalMap)
             {
                 var value = sourceProp.GetValue(dto);
                 targetProp.SetValue(result, value);

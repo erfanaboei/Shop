@@ -156,7 +156,7 @@ namespace Shop.Application.Services
             
             var options = GetAll(conditions); 
             
-            //result.AddRange(Mapper.ToOptionList(options));
+            result.AddRange(options.ToOptions());
 
             return result;
         }
