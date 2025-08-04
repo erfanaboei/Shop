@@ -48,6 +48,14 @@ namespace Shop.Application.Mappings
             return this;
         }
         
+        public FluentToDtoMapperContext<TModel, TDto> Ignore(string propertyName, IgnoreMode ignoreMode = IgnoreMode.Skip)
+        {
+            if (!string.IsNullOrWhiteSpace(propertyName))
+                _ignoredProperties.Add((propertyName, ignoreMode));
+
+            return this;
+        }
+        
         public TDto Map()
         {
             var mapper = GenericMapperRegistry.GetMapper<TModel, TDto>();
@@ -128,18 +136,26 @@ namespace Shop.Application.Mappings
             return this;
         }
         
+        public FluentToModelMapperContext<TDto, TModel> Ignore(string propertyName, IgnoreMode ignoreMode = IgnoreMode.Skip)
+        {
+            if (!string.IsNullOrWhiteSpace(propertyName))
+                _ignoredProperties.Add((propertyName, ignoreMode));
+
+            return this;
+        }
+        
         public TModel Map()
         {
             var mapper = GenericMapperRegistry.GetMapper<TModel, TDto>();
             
             var skipProps = _ignoredProperties.Where(x => x.mode == IgnoreMode.Skip).Select(r=> r.propName).ToList();
             
-            var dto = mapper.ToModel(_dto, _model, skipProps);
+            var model = mapper.ToModel(_dto, _model, skipProps);
 
-            ApplyIgnoreRules(dto);
-            ApplyMappingRules(dto);
+            ApplyIgnoreRules(model);
+            ApplyMappingRules(model);
             
-            return dto;
+            return model;
         }
 
         private void ApplyIgnoreRules(TModel model)

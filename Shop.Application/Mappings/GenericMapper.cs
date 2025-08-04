@@ -83,7 +83,7 @@ namespace Shop.Application.Mappings
 
             if (ignoreProperties != null && ignoreProperties.Any())
             {
-                finalMap = propertyMap.Where(r => ignoreProperties.Contains(r.SourceProp.Name)).ToList();
+                finalMap = propertyMap.Where(r => !ignoreProperties.Contains(r.SourceProp.Name)).ToList();
             }
             
             foreach (var (sourceProp, targetProp) in finalMap)

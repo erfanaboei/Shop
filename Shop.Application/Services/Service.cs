@@ -94,7 +94,7 @@ namespace Shop.Application.Services
 
             SetDefaultValueIfMatch(dto, nameof(BaseDto.UpdateDate), DateTime.Now, DateTime.MinValue);
             
-            var model = dto.ToModel<TModel, TDto>().Map();
+            var model = dto.ToModel<TModel, TDto>().Ignore(nameof(BaseEntity.CreateDate)).Map();
             Repository.Update(model);
             
             return new RequestResult<TDto>(true, RequestResultStatusCode.Success, dto);
@@ -236,9 +236,25 @@ namespace Shop.Application.Services
             if (dto == null)
                 return new RequestResult<TDto>(false, RequestResultStatusCode.NotFound, null);
 
-            SetDefaultValueIfMatch(dto, nameof(BaseDto.UpdateDate), DateTime.Now, DateTime.MinValue);
+            var idProp = typeof(TDto).GetProperty("Id");
+
+            if (idProp == null)
+                return new RequestResult<TDto>(false, RequestResultStatusCode.BadRequest, null, "محصول مورد نظر یافت نشد!");
+
+            var id = (int)idProp.GetValue(dto)!;
+            if (id == 0)
+                return new RequestResult<TDto>(false, RequestResultStatusCode.BadRequest, null, "محصول مورد نظر یافت نشد!");
             
-            var model = dto.ToModel<TModel, TDto>().Map();
+            SetDefaultValueIfMatch(dto, nameof(BaseDto.UpdateDate), (DateTime?)DateTime.Now, DateTime.MinValue);
+            
+            var model = await GetByIdAsync(id, cancellationToken);
+
+            if (model == null)
+                return new RequestResult<TDto>(false, RequestResultStatusCode.BadRequest, null, "محصول مورد نظر یافت نشد!");
+            
+            dto.ToModel(model).Ignore("CreateDate").Map();
+            
+            //var model = dto.ToModel<TModel, TDto>().Ignore(nameof(BaseEntity.CreateDate)).Map();
             await Repository.UpdateAsync(model, cancellationToken);
             
             return new RequestResult<TDto>(true , RequestResultStatusCode.Success, dto);
@@ -247,7 +263,7 @@ namespace Shop.Application.Services
         public async Task<RequestResult<TModel>> UpdateByModelAsync(TModel model, CancellationToken cancellationToken)
         {
             SetDefaultValueIfMatch(model, nameof(BaseDto.UpdateDate), DateTime.Now, DateTime.MinValue);
-
+            
             model = await Repository.UpdateAsync(model, cancellationToken);
             
             return new RequestResult<TModel>(true, RequestResultStatusCode.Success, model);
@@ -322,7 +338,7 @@ namespace Shop.Application.Services
             if (property == null || property.PropertyType != typeof(TProperty)) return;
             
             var value = (TProperty)property.GetValue(dto);
-            if (EqualityComparer<TProperty>.Default.Equals(value, expectedValue))
+            if (EqualityComparer<TProperty>.Default.Equals(value, expectedValue) || value is null)
             {
                 property.SetValue(dto, defaultValue);
             }
