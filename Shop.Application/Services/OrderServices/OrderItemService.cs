@@ -1,0 +1,15 @@
+﻿using Shop.Application.IServices.IOrderServices;
+using Shop.Domain;
+using Shop.Domain.DataTransferObjects.OrderDataTransferObjects;
+using Shop.Domain.IRepositories;
+using Shop.Domain.Models.Orders;
+
+namespace Shop.Application.Services.OrderServices
+{
+    public class OrderItemService: Service<OrderItem, OrderItemDto>, IOrderItemService, IScopedDependency
+    {
+        public OrderItemService(IRepository<OrderItem> repository) : base(repository)
+        {
+        }
+    }
+}

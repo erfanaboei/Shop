@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using Shop.Domain.Models.Orders;
 
 namespace Shop.Domain.Models.Products
 {
@@ -16,7 +17,8 @@ namespace Shop.Domain.Models.Products
         public Product Product { get; set; }
 
         public List<ProductVariantAttributeValue> ProductVariantAttributeValues { get; set; }
-
+        public List<OrderItem> OrderItems { get; set; }
+        
         #endregion
     }
 }

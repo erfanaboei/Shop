@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Shop.Data.Context;
 
 namespace Shop.Data.Migrations
 {
     [DbContext(typeof(ShopContext))]
-    partial class ShopContextModelSnapshot : ModelSnapshot
+    [Migration("20250805160228_AddStaticPageTable")]
+    partial class AddStaticPageTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -226,67 +228,6 @@ namespace Shop.Data.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("Shop.Domain.Models.Orders.Order", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeleteDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("TotalAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Orders");
-                });
-
-            modelBuilder.Entity("Shop.Domain.Models.Orders.OrderItem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductVariantId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("UnitPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderId");
-
-                    b.HasIndex("ProductVariantId");
-
-                    b.ToTable("OrderItems");
-                });
-
             modelBuilder.Entity("Shop.Domain.Models.Products.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -471,7 +412,7 @@ namespace Shop.Data.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "3b244fc5-b28c-4baf-9ad6-b82bbb220337",
+                            ConcurrencyStamp = "55d6ba91-b43e-4a0e-a13a-52bbc496fae9",
                             CreateDate = new DateTime(2025, 7, 10, 7, 46, 0, 0, DateTimeKind.Local),
                             Description = "SuperAdmin",
                             Name = "SuperAdmin"
@@ -479,7 +420,7 @@ namespace Shop.Data.Migrations
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "abf2725d-a20e-4bbb-90d4-7adf9676b87d",
+                            ConcurrencyStamp = "df2b7785-519f-42e6-9da7-9df209397521",
                             CreateDate = new DateTime(2025, 7, 10, 7, 46, 0, 0, DateTimeKind.Local),
                             Description = "Admin role",
                             Name = "Admin"
@@ -487,7 +428,7 @@ namespace Shop.Data.Migrations
                         new
                         {
                             Id = 3,
-                            ConcurrencyStamp = "db39a8d2-9d0b-454e-a61e-6a8c88082713",
+                            ConcurrencyStamp = "88d3215d-7681-4a2b-8a2b-dd579402e005",
                             CreateDate = new DateTime(2025, 7, 10, 7, 46, 0, 0, DateTimeKind.Local),
                             Description = "Customer",
                             Name = "Customer"
@@ -652,7 +593,7 @@ namespace Shop.Data.Migrations
                             Id = 1,
                             AccessFailedCount = 0,
                             Code = "1",
-                            ConcurrencyStamp = "2bd21205-57ed-4a17-8476-daae9243b3b2",
+                            ConcurrencyStamp = "1df69157-d301-46e7-adfa-1ab10cc515c1",
                             CreateDate = new DateTime(2025, 7, 10, 7, 46, 0, 0, DateTimeKind.Local),
                             EmailConfirmed = false,
                             LockoutEnabled = false,
@@ -667,7 +608,7 @@ namespace Shop.Data.Migrations
                             Id = 2,
                             AccessFailedCount = 0,
                             Code = "2",
-                            ConcurrencyStamp = "f9b86ccd-8a63-4097-8ace-9e5863671686",
+                            ConcurrencyStamp = "e00c1bbf-0a56-463e-9b4e-65aa34d7aebf",
                             CreateDate = new DateTime(2025, 7, 10, 7, 46, 0, 0, DateTimeKind.Local),
                             EmailConfirmed = false,
                             LockoutEnabled = false,
@@ -750,36 +691,6 @@ namespace Shop.Data.Migrations
                     b.Navigation("Parent");
                 });
 
-            modelBuilder.Entity("Shop.Domain.Models.Orders.Order", b =>
-                {
-                    b.HasOne("Shop.Domain.Models.Users.User", "User")
-                        .WithMany("Orders")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Shop.Domain.Models.Orders.OrderItem", b =>
-                {
-                    b.HasOne("Shop.Domain.Models.Orders.Order", "Order")
-                        .WithMany("OrderItems")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Shop.Domain.Models.Products.ProductVariant", "ProductVariant")
-                        .WithMany("OrderItems")
-                        .HasForeignKey("ProductVariantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Order");
-
-                    b.Navigation("ProductVariant");
-                });
-
             modelBuilder.Entity("Shop.Domain.Models.Products.ProductCategory", b =>
                 {
                     b.HasOne("Shop.Domain.Models.Categories.Category", "Category")
@@ -857,11 +768,6 @@ namespace Shop.Data.Migrations
                     b.Navigation("ProductCategories");
                 });
 
-            modelBuilder.Entity("Shop.Domain.Models.Orders.Order", b =>
-                {
-                    b.Navigation("OrderItems");
-                });
-
             modelBuilder.Entity("Shop.Domain.Models.Products.Product", b =>
                 {
                     b.Navigation("ProductCategories");
@@ -873,14 +779,7 @@ namespace Shop.Data.Migrations
 
             modelBuilder.Entity("Shop.Domain.Models.Products.ProductVariant", b =>
                 {
-                    b.Navigation("OrderItems");
-
                     b.Navigation("ProductVariantAttributeValues");
-                });
-
-            modelBuilder.Entity("Shop.Domain.Models.Users.User", b =>
-                {
-                    b.Navigation("Orders");
                 });
 #pragma warning restore 612, 618
         }

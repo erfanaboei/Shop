@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,16 +12,9 @@ using Microsoft.IdentityModel.Tokens;
 using Shop.Application;
 using Shop.Application.Extensions;
 using Shop.Application.Mappings;
-using Shop.Application.Mappings.AttributeMappings;
-using Shop.Application.Mappings.CategoryMappings;
-using Shop.Application.Mappings.ProductMappings;
-using Shop.Application.Mappings.RoleMappings;
-using Shop.Application.Mappings.SuperSettingMappings;
-using Shop.Application.Mappings.UserMappings;
 using Shop.Application.Utilities;
 using Shop.Data.Context;
 using Shop.Domain.Models.Users;
-using Attribute = Shop.Domain.Models.Attributes.Attribute;
 
 namespace Shop.IOC.Configurations
 {

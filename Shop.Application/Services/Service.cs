@@ -92,12 +92,27 @@ namespace Shop.Application.Services
             if (dto == null)
                 return new RequestResult<TDto>(false, RequestResultStatusCode.NotFound, null);
 
-            SetDefaultValueIfMatch(dto, nameof(BaseDto.UpdateDate), DateTime.Now, DateTime.MinValue);
+            var idProp = typeof(TDto).GetProperty("Id");
+
+            if (idProp == null)
+                return new RequestResult<TDto>(false, RequestResultStatusCode.BadRequest, null, "محصول مورد نظر یافت نشد!");
+
+            var id = (int)idProp.GetValue(dto)!;
+            if (id == 0)
+                return new RequestResult<TDto>(false, RequestResultStatusCode.BadRequest, null, "محصول مورد نظر یافت نشد!");
             
-            var model = dto.ToModel<TModel, TDto>().Ignore(nameof(BaseEntity.CreateDate)).Map();
-            Repository.Update(model);
+            SetDefaultValueIfMatch(dto, nameof(BaseDto.UpdateDate), (DateTime?)DateTime.Now, DateTime.MinValue);
+
+            var model = GetById(id);
+
+            if (model == null)
+                return new RequestResult<TDto>(false, RequestResultStatusCode.BadRequest, null, "محصول مورد نظر یافت نشد!");
             
-            return new RequestResult<TDto>(true, RequestResultStatusCode.Success, dto);
+            dto.ToModel(model).Ignore("CreateDate").Map();
+            
+             Repository.Update(model);
+            
+            return new RequestResult<TDto>(true , RequestResultStatusCode.Success, dto);
         }
 
         public RequestResult<TModel> UpdateByModel(TModel model)

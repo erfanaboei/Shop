@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.VisualBasic.CompilerServices;
 using Shop.Domain.CustomAttributes;
+using Shop.Domain.Models.Orders;
 
 namespace Shop.Domain.Models.Users
 {
@@ -24,6 +26,12 @@ namespace Shop.Domain.Models.Users
         public DateTime? DeleteDate { get; set; }
         public DateTime? UpdateDate { get; set; }
         public DateTime? LastLoginDate { get; set; }
+
+        #region Navigation Property
+
+        public List<Order> Orders { get; set; }
+
+        #endregion
     }
 
     public class UserConfiguration : IEntityTypeConfiguration<User>

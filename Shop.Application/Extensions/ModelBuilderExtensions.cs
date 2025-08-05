@@ -3,7 +3,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Shop.Domain.DataTransferObjects.SuperSettingDataTransferObjects;
+using Shop.Domain.Enums.Orders;
 using Shop.Domain.Models;
+using Shop.Domain.Models.Orders;
 using Shop.Domain.Models.SuperSettings;
 
 namespace Shop.Application.Extensions
@@ -60,6 +62,8 @@ namespace Shop.Application.Extensions
         {
             modelBuilder.Entity<SuperSetting>().Property(r => r.Type)
                 .HasConversion(r=> r.ToString(), r => (SuperSettingTypeEnum)Enum.Parse(typeof(SuperSettingTypeEnum), r));
+            modelBuilder.Entity<Order>().Property(r => r.Status)
+                .HasConversion(r => r.ToString(), r => (OrderStatusEnum)Enum.Parse(typeof(OrderStatusEnum), r));
         }
     }
 }
